@@ -1,3 +1,4 @@
+mod input;
 mod presentation;
 mod session;
 mod x11;
@@ -354,6 +355,9 @@ impl App {
                     }
                 }
             }
+            Event::MotionNotify(event) => self.handle_motion(&event),
+            Event::ButtonPress(event) => self.handle_button(&event, true),
+            Event::ButtonRelease(event) => self.handle_button(&event, false),
             Event::Error(error) => log::warn!("X11 error: {error:?}"),
             _ => {}
         }
