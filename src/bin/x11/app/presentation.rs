@@ -298,6 +298,13 @@ pub(super) unsafe extern "C" fn on_frame_ready(
         return;
     }
     drop(presenter);
+    log::trace!(
+        "[{}] FrameReady generation={} index={} seq={}",
+        binding.display_name,
+        f.buffer_generation,
+        f.buffer_index,
+        f.seq
+    );
     request_present(binding);
 }
 

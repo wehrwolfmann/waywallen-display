@@ -193,7 +193,6 @@ impl App {
             entry.monitor.identity
         );
         let watcher = Arc::new(watcher::OutputInfo::new());
-        watcher.set_logical_size(physical);
         if let Some(windows) = self.window_states.get(&display_name) {
             watcher.replace_windows(windows.clone());
         }
@@ -275,7 +274,6 @@ impl App {
                         binding
                             .refresh_mhz
                             .store(entry.monitor.refresh_mhz, Ordering::SeqCst);
-                        binding.watcher.set_logical_size(physical);
                         *binding.configured_size.lock().unwrap() = Some(physical);
                         binding
                             .presenter
@@ -543,8 +541,9 @@ pub(super) fn run(socket: PathBuf, _name_prefix: String) -> Result<()> {
     .context("RRSelectInput")?;
     let server_drm = x11::server_drm_device(&conn, screen.root);
 
-    let (_watcher_sender, watcher_commands) =
+    let (watcher_sender, watcher_commands) =
         watcher::command_channel().context("create watcher command channel")?;
+    let window_observation_available = watcher::x11::spawn(watcher_sender);
     let mut app = App {
         screen,
         atoms,
@@ -553,7 +552,7 @@ pub(super) fn run(socket: PathBuf, _name_prefix: String) -> Result<()> {
         uds_sock: socket,
         watcher_commands,
         window_states: HashMap::new(),
-        window_observation_available: false,
+        window_observation_available,
         vulkan: None,
         conn,
     };

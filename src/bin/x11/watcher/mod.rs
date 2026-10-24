@@ -4,6 +4,8 @@ use std::os::unix::net::UnixStream;
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::{Arc, Mutex};
 
+pub mod x11;
+
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Window {
     pub application_id: String,
@@ -61,24 +63,14 @@ impl Observation {
 }
 
 pub struct OutputInfo {
-    logical_size: Mutex<Option<(u32, u32)>>,
     observation: Mutex<Observation>,
 }
 
 impl OutputInfo {
     pub fn new() -> Self {
         Self {
-            logical_size: Mutex::new(None),
             observation: Mutex::new(Observation::default()),
         }
-    }
-
-    pub fn logical_size(&self) -> Option<(u32, u32)> {
-        *self.logical_size.lock().unwrap()
-    }
-
-    pub fn set_logical_size(&self, size: (u32, u32)) {
-        *self.logical_size.lock().unwrap() = Some(size);
     }
 
     pub fn window_flags(&self) -> u32 {
