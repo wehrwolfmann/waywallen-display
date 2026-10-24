@@ -34,8 +34,10 @@ fn main() {
     let egl = cfg!(feature = "egl");
     let vulkan = cfg!(feature = "vulkan");
     let layer_shell = cfg!(feature = "layer-shell");
+    let x11 = cfg!(feature = "x11");
 
-    if layer_shell {
+    // The X11 client reuses the layer-shell presenter shaders as-is.
+    if layer_shell || x11 {
         compile_layer_shell_shaders(&manifest_dir, &out_dir);
     }
 
